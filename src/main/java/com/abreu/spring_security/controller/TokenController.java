@@ -1,8 +1,8 @@
 package com.abreu.spring_security.controller;
 
 import com.abreu.spring_security.entities.Role;
-import com.abreu.spring_security.entities.dto.LoginRequestDTO;
-import com.abreu.spring_security.entities.dto.LoginResponseDTO;
+import com.abreu.spring_security.entities.dto.login.LoginRequestDTO;
+import com.abreu.spring_security.entities.dto.login.LoginResponseDTO;
 import com.abreu.spring_security.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class TokenController {
     }
 
     @PostMapping("/login")
+    @Transactional
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
 
         var user = userRepository.findByUsername(loginRequest.username());
