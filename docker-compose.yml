@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    environment:
+      - MYSQL_PASSWORD=admin123
+      - MYSQL_DATABASE=dbsecurity
+      - MYSQL_ROOT_PASSWORD=admin123
