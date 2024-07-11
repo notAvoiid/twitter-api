@@ -3,8 +3,12 @@ package com.abreu.spring_security.controller;
 import com.abreu.spring_security.entities.Role;
 import com.abreu.spring_security.entities.Tweet;
 import com.abreu.spring_security.entities.dto.tweet.CreateTweetDTO;
+import com.abreu.spring_security.entities.dto.tweet.FeedDTO;
+import com.abreu.spring_security.entities.dto.tweet.FeedItemDTO;
 import com.abreu.spring_security.repositories.TweetRepository;
 import com.abreu.spring_security.repositories.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -14,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/tweets")
 public class TweetController {
 
     private final TweetRepository tweetRepository;
@@ -25,7 +30,19 @@ public class TweetController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/tweets")
+    @GetMapping("/feed")
+    public ResponseEntity<FeedDTO> feed(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+
+
+        var tweets = tweetRepository.findAll(PageRequest.of(page, pageSize, Sort.Direction.DESC, "creationTimestamp"))
+                .map(tweet -> new FeedItemDTO(tweet.getTweetId(), tweet.getContent(), tweet.getUser().getUsername()));
+
+        return ResponseEntity.ok(new FeedDTO(tweets.getContent(), page, pageSize, tweets.getTotalPages(), tweets.getTotalElements()));
+    }
+
+    @PostMapping
     public ResponseEntity<Void> createTweet(
             @RequestBody CreateTweetDTO data,
             JwtAuthenticationToken token
@@ -39,7 +56,7 @@ public class TweetController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/tweets/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTweet(
             @PathVariable Long id,
             JwtAuthenticationToken token
