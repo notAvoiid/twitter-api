@@ -30,4 +30,8 @@ public class Tweet {
     @CreationTimestamp
     private Instant creationTimestamp;
 
+    public Tweet(User user, String content) {
+        this.user = user;
+        this.content = content;
+    }
 }
